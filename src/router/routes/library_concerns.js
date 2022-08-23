@@ -27,7 +27,7 @@ export default [
   {
     path: '/apps/libraryConcerns/edit/:resources_id',
     name: 'editLibraryConcerns',
-    component: () => import('@/views/libraryConcerns/editResources'),
+    component: () => import('@/views/libraryConcerns/editConcern'),
     meta: {
       pageTitle: 'Edit Library Concerns',
     },

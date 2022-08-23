@@ -1,13 +1,14 @@
 <template>
 
+
   <b-card>
-    <b-button
-        style="margin-bottom: 10px"
-        variant="primary"
-        @click="() => $router.push(`/apps/libraryConcerns/creat`)"
-    >
-      Add
-    </b-button>
+<!--    <b-button-->
+<!--        style="margin-bottom: 10px"-->
+<!--        variant="primary"-->
+<!--        @click="() => $router.push(`/apps/eResources/creatResources`)"-->
+<!--    >-->
+<!--      Add-->
+<!--    </b-button>-->
     <b-sidebar
         id="sidebar-creat"
         backdrop
@@ -41,61 +42,6 @@
             />
           </b-form-group>
         </b-col>
-        <b-col md="4">
-          <b-form-group>
-            <label>Author:</label>
-            <b-form-input
-                class="d-inline-block"
-                placeholder="Search"
-                type="text"
-                @input="advanceSearch"
-            />
-          </b-form-group>
-        </b-col>
-        <b-col md="4">
-          <b-form-group>
-            <label>Department:</label>
-            <b-form-input
-                class="d-inline-block"
-                placeholder="Search"
-                type="text"
-                @input="advanceSearch"
-            />
-          </b-form-group>
-        </b-col>
-        <b-col md="4">
-          <b-form-group>
-            <label>Resource:</label>
-            <b-form-input
-                class="d-inline-block"
-                placeholder="Search"
-                type="text"
-                @input="advanceSearch"
-            />
-          </b-form-group>
-        </b-col>
-        <b-col md="4">
-          <b-form-group>
-            <label>Status:</label>
-            <b-form-input
-                class="d-inline-block"
-                placeholder="Search"
-                type="text"
-                @input="advanceSearch"
-            />
-          </b-form-group>
-        </b-col>
-        <!--        <b-col md="4">-->
-        <!--          <b-form-group>-->
-        <!--            <label>Salary:</label>-->
-        <!--            <b-form-input-->
-        <!--                class="d-inline-block"-->
-        <!--                placeholder="Search"-->
-        <!--                type="text"-->
-        <!--                @input="advanceSearch"-->
-        <!--            />-->
-        <!--          </b-form-group>-->
-        <!--        </b-col>-->
       </b-row>
     </div>
 
@@ -104,6 +50,7 @@
       <b-table
           :current-page="currentPage"
           :fields="fields"
+          :filter="filter"
           :items="items"
           :per-page="perPage"
           :sort-by.sync="sortBy"
@@ -128,43 +75,50 @@
         <!-- full detail on click -->
         <template #row-details="row">
           <b-card>
+<!--            <b-row class="mb-2">-->
+<!--              <b-col>-->
+<!--                <div class="bg-light-primary rounded-top text-center">-->
+<!--                  <img src="@/images/concern_detail.png"/>-->
+<!--                </div>-->
+<!--              </b-col>-->
+<!--            </b-row>-->
+
+
             <b-row class="mb-2">
               <b-col
                   class="mb-1"
                   md="4"
               >
-                <strong>Title : </strong>{{ row.item.full_name }}
+                <strong>Published Date : </strong>{{ row.item.date }}
               </b-col>
               <b-col
                   class="mb-1"
                   md="4"
               >
-                <strong>Author : </strong>{{ row.item.post }}
+                <strong>Concern : </strong>{{ row.item.concern }}
               </b-col>
               <b-col
                   class="mb-1"
+                  @click="getFile(row.item.file)"
                   md="4"
               >
-                <strong>Department : </strong>{{ row.item.email }}
+                <strong>Uploaded File : </strong>Click Here to Download Document
               </b-col>
               <b-col
                   class="mb-1"
+                  @click="getFile(row.item.head_approval)"
                   md="4"
               >
-                <strong>Resource : </strong>{{ row.item.city }}
+                <strong>Head Approval : </strong>Click Here to Download Head Approval
               </b-col>
               <b-col
                   class="mb-1"
+                  @click="getFile(row.item.head_approval)"
                   md="4"
               >
-                <strong>Status : </strong>{{ row.item.salary }}
+                <strong>Head Approval : </strong>Click Here to Download Final Document
               </b-col>
-              <!--              <b-col-->
-              <!--                  class="mb-1"-->
-              <!--                  md="4"-->
-              <!--              >-->
-              <!--                <strong>Age : </strong>{{ row.item.age }}-->
-              <!--              </b-col>-->
+
             </b-row>
             <div class="demo-inline-spacing">
               <b-button
@@ -178,33 +132,125 @@
                   size="sm"
                   style="margin-left: 10px"
                   variant="outline-primary"
-                  @click="() => $router.push(`/apps/libraryConcerns/edit/${1}`)"
+                  @click="() => $router.push(`/apps/libraryConcerns/edit/${items[row.index].id}`)"
               >
                 edit
               </b-button>
-              <b-button
-                  size="sm"
-                  style="margin-left: 10px"
-                  variant="outline-danger"
-              >
-                Delete
-              </b-button>
-              <b-button
-                  size="sm"
-                  style="margin-left: 10px"
-                  variant="outline-secondary"
-                  @click="row.id"
-              >
-                draft
-              </b-button>
-              <b-button
-                  size="sm"
-                  style="margin-left: 10px"
-                  variant="outline-success"
-                  @click="row.id"
-              >
-                published
-              </b-button>
+              <div v-if="row.item.status === 1">
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-success"
+                >
+                  Successfully submitted
+                </b-button>
+              </div>
+              <div v-if="row.item.status !== 1">
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-danger"
+                    @click="updateEResourceStatus(row.item.id,'1',5)"
+                >
+                  Successfully submitted
+                </b-button>
+              </div>
+              <div v-if="row.item.status === 2">
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-success"
+                >
+                  Reviewed by Head/Secretary
+                </b-button>
+              </div>
+              <div v-if="row.item.status !== 2">
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-danger"
+                    @click="updateEResourceStatus(row.item.id,'2',5)"
+                >
+                  Reviewed by Head/Secretary
+                </b-button>
+              </div>
+              <div v-if="row.item.status === 3">
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-success"
+                >
+                  Accepted for review
+                </b-button>
+              </div>
+              <div v-if="row.item.status !== 3">
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-danger"
+                    @click="updateEResourceStatus(row.item.id,'3',5)"
+                >
+                  Accepted for review
+                </b-button>
+              </div>
+              <div v-if="row.item.status === 4">
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-success"
+                >
+                  Reviewed by the Library
+                </b-button>
+              </div>
+              <div v-if="row.item.status !== 4">
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-danger"
+                    @click="updateEResourceStatus(row.item.id,'4',5)"
+                >
+                  Reviewed by the Library
+                </b-button>
+              </div>
+              <div v-if="row.item.status === 5">
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-success"
+                >
+                  Final Decision
+                </b-button>
+              </div>
+              <div v-if="row.item.status !== 5">
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-danger"
+                    @click="updateEResourceStatus(row.item.id,'5',5)"
+                >
+                  Final Decision
+                </b-button>
+              </div>
+              <div>
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-primary"
+                    @click="updateEResourceStatus(row.item.id,getIsActiveValue(row.item.is_active),5)"
+                >
+                  {{ getIsActiveValue(row.item.is_active) }}
+                </b-button>
+              </div>
+              <div>
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-primary"
+                    @click="updateEResourceStatus(row.item.id,getIsPublicValue(row.item.is_public),5)"
+                >
+                  {{ getIsPublicValue(row.item.is_public) }}
+                </b-button>
+              </div>
             </div>
           </b-card>
         </template>
@@ -287,6 +333,7 @@ import {
   BFormGroup,
   BFormInput,
   BFormSelect,
+  BImg,
   BPagination,
   BRow,
   BSidebar,
@@ -297,12 +344,17 @@ import { VueGoodTable } from 'vue-good-table'
 import store from '@/store/index'
 import Ripple from 'vue-ripple-directive'
 import SidebarContent from './SidebarContent.vue'
+import vSelect from 'vue-select'
+import axios from 'axios'
+// import {useRouter} from "vue-router";
 // import { codeAdvance } from './code'
 /* eslint-disable */
 export default {
   components: {
     BCard,
+    BImg,
     BCardBody,
+    vSelect,
     BBadge,
     BSidebar,
     SidebarContent,
@@ -331,192 +383,50 @@ export default {
       pageLength: 5,
       pageOptions: [3, 5, 10],
       perPage: 5,
-      totalRows: 1,
+      totalRows: 10,
       currentPage: 1,
+      edit_id: '',
+      edit_title: '',
+      edit_url: '',
+      edit_cover: '',
+      edit_description: '',
       sortBy: '',
       sortDesc: false,
       sortDirection: 'asc',
       dir: false,
-      columns: [
-        {
-          label: 'Title',
-          field: 'fullName',
-        },
-        {
-          label: 'Author',
-          field: 'email',
-        },
-        {
-          label: 'Status',
-          field: 'post',
-        },
-        {
-          label: 'Department',
-          field: 'city',
-        },
-        {
-          label: 'Resource',
-          field: 'startDate',
-        },
-        {
-          label: 'Actions',
-          field: 'salary',
-        },
-      ],
+      // filter: {
+      //   resource:null,
+      //   department:null,
+      // },
+      filter: null,
+      resource: '',
+      resourceOptions: ['Thesis', 'General'],
+      department: '',
+      departmentOptions: ['Nursing', 'BMS', 'Psychology', 'Management', 'Acupuncture', 'IT'],
       rows: [],
       searchTerm: '',
       fields: [
         'show_details',
         'id',
-        // {
-        //   key: 'avatar',
-        //   label: 'Avatar'
-        // },
-        'Title',
-        'Author',
-        'Department',
-        'Resource',
+        'student_id',
+        'concern_id',
         {
           key: 'status',
           label: 'Status'
 
-        }],
+        },
+        'date',
+        'is_active',
+        'is_public'],
       /* eslint-disable global-require */
-      items: [
-        {
-          id: 1,
-          avatar: require('@/assets/images/avatars/10-small.png'),
-          Title: 'Korrie O\'Crevy',
-          Author: 'Nuclear Power Engineer',
-          Department: 'kocrevy0@thetimes.co.uk',
-          Resource: 'Krasnosilka',
-          status: 2,
-        },
-        {
-          id: 2,
-          avatar: require('@/assets/images/avatars/1-small.png'),
-          full_name: 'Bailie Coulman',
-          post: 'VP Quality Control',
-          email: 'bcoulman1@yolasite.com',
-          city: 'Hinigaran',
-          start_date: '05/20/2018',
-          salary: '$13633.69',
-          age: '63',
-          experience: '3 Years',
-          status: 2,
-        },
-        {
-          id: 3,
-          avatar: require('@/assets/images/avatars/9-small.png'),
-          full_name: 'Stella Ganderton',
-          post: 'Operator',
-          email: 'sganderton2@tuttocitta.it',
-          city: 'Golcowa',
-          start_date: '03/24/2018',
-          salary: '$13076.28',
-          age: '66',
-          experience: '6 Years',
-          status: 5,
-        },
-        {
-          id: 4,
-          avatar: require('@/assets/images/avatars/3-small.png'),
-          full_name: 'Dorolice Crossman',
-          post: 'Cost Accountant',
-          email: 'dcrossman3@google.co.jp',
-          city: 'Paquera',
-          start_date: '12/03/2017',
-          salary: '$12336.17',
-          age: '22',
-          experience: '2 Years',
-          status: 2,
-        },
-        {
-          id: 5,
-          avatar: require('@/assets/images/avatars/4-small.png'),
-          full_name: 'Harmonia Nisius',
-          post: 'Senior Cost Accountant',
-          email: 'hnisius4@gnu.org',
-          city: 'Lucan',
-          start_date: '08/25/2017',
-          salary: '$10909.52',
-          age: '33',
-          experience: '3 Years',
-          status: 2,
-        },
-        {
-          id: 6,
-          avatar: require('@/assets/images/avatars/5-small.png'),
-          full_name: 'Genevra Honeywood',
-          post: 'Geologist',
-          email: 'ghoneywood5@narod.ru',
-          city: 'Maofan',
-          start_date: '06/01/2017',
-          salary: '$17803.80',
-          age: '61',
-          experience: '1 Year',
-          status: 1,
-        },
-        {
-          id: 7,
-          avatar: require('@/assets/images/avatars/7-small.png'),
-          full_name: 'Eileen Diehn',
-          post: 'Environmental Specialist',
-          email: 'ediehn6@163.com',
-          city: 'Lampuyang',
-          start_date: '10/15/2017',
-          salary: '$18991.67',
-          age: '59',
-          experience: '9 Years',
-          status: 3,
-        },
-        {
-          id: 8,
-          avatar: require('@/assets/images/avatars/9-small.png'),
-          full_name: 'Richardo Aldren',
-          post: 'Senior Sales Associate',
-          email: 'raldren7@mtv.com',
-          city: 'Skoghall',
-          start_date: '11/05/2016',
-          salary: '$19230.13',
-          age: '55',
-          experience: '5 Years',
-          status: 3,
-        },
-        {
-          id: 9,
-          avatar: require('@/assets/images/avatars/2-small.png'),
-          full_name: 'Allyson Moakler',
-          post: 'Safety Technician',
-          email: 'amoakler8@shareasale.com',
-          city: 'Mogilany',
-          start_date: '12/29/2018',
-          salary: '$11677.32',
-          age: '39',
-          experience: '9 Years',
-          status: 5,
-        },
-        {
-          id: 10,
-          avatar: require('@/assets/images/avatars/6-small.png'),
-          full_name: 'Merline Penhalewick',
-          post: 'Junior Executive',
-          email: 'mpenhalewick9@php.net',
-          city: 'Kanuma',
-          start_date: '04/19/2019',
-          salary: '$15939.52',
-          age: '23',
-          experience: '3 Years',
-          status: 2,
-        },
-      ],
+      items: [],
       /* eslint-disable global-require */
       status: [{
-        1: 'Current',
-        2: 'Professional',
-        3: 'Rejected',
-        4: 'Resigned',
-        5: 'Applied',
+        1: 'Successfully submitted',
+        2: 'Reviewed by Head/Secretary',
+        3: 'Accepted for review',
+        4: 'Reviewed by the Library',
+        5: 'Final Decision',
       },
         {
           1: 'light-primary',
@@ -527,6 +437,12 @@ export default {
         }],
     }
   },
+  setup(){
+    // const router = useRouter();
+    return{
+    }
+  },
+
   /* eslint-disable */
   computed: {
     direction() {
@@ -546,26 +462,71 @@ export default {
   },
   /* eslint-disable */
   created() {
-    this.$http.get('/good-table/advanced-search')
-        .then(res => {
-          this.rows = res.data
+    fetch("http://localhost:8081/concern/get-all-info?page=1&limit=2000&sort=tt")
+        .then(async response => {
+          const data = await response.json();
+          this.items = data.data.items;
+          this.totalRows = data.data.total;
+        })
+        .catch(error => {
+          this.errorMessage = error;
+          console.error("There was an error!", error);
         })
   },
   methods: {
     advanceSearch(val) {
-      this.searchTerm = val
+      this.filter = val
     },
-    onRowClick(params) {
-      console.log(params)
-      // this.$toast({
-      //   component: SidebarContent,
-      //   props: {
-      //     title: `Hello user! You have clicked on row ${params.row.id}`,
-      //     icon: 'UserIcon',
-      //     variant: 'success',
-      //   },
-      // })
+    edit(val, title) {
+
+      this.edit_id = val
+      this.edit_title = title
+      this.edit_url = url
+      this.edit_description = description
+      this.edit_cover = cover
     },
+    getIsActiveValue(val) {
+      if (val === 1)
+        return 'Inactive'
+      else
+        return 'Active'
+    },
+    getIsPublicValue(val) {
+      if (val == 1)
+        return 'Private'
+      else
+        return 'Public'
+    },
+    getStatusColour(val) {
+      return 'outline-success'
+    },
+    updateEResourceStatus(data, status, updated_user) {
+      axios.put("http://localhost:8081/concern/update-status", null,
+          {params: {data, status, updated_user}})
+          .then(response => window.location.reload());
+    },
+    getData() {
+      axios.get("http://localhost:8081/database/get-all-info?page=1&limit=20&sort=tt")
+          .then(response => {
+            const data = response.json();
+            this.items = data.data.items;
+          });
+    },
+    getFile(data) {
+      axios.get("http://localhost:8081/concern/downloadFile",
+          {params: {data}}),
+          {responseType: 'blob'}
+              .then(response => {
+                var fileURL = window.URL.createObjectURL(new Blob([response.data]));
+                var fileLink = document.createElement('a');
+
+                fileLink.href = fileURL;
+                fileLink.setAttribute('download', 'file.pdf');
+                document.body.appendChild(fileLink);
+
+                fileLink.click();
+              });
+    }
   },
 }
 </script>

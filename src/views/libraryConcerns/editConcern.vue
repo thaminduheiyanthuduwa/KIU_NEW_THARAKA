@@ -14,27 +14,14 @@
                     id="v-title"
                     v-model="post_values.title"
                     placeholder="Title"
+                    readonly="true"
                 />
               </b-form-group>
             </b-col>
 
             <b-col cols="12">
               <b-form-group
-                  label="Documents"
-                  label-for="v-documents"
-              >
-                <b-form-file
-
-                    @change="handleFileUpload( $event )"
-                    :placeholder="this.getDocumentName()"
-                    drop-placeholder="Drop file here..."
-                />
-              </b-form-group>
-            </b-col>
-
-            <b-col cols="12">
-              <b-form-group
-                  label="Cover Photo"
+                  label="Upload Final Document Here"
                   label-for="v-documents"
               >
                 <b-form-file
@@ -45,19 +32,20 @@
               </b-form-group>
             </b-col>
 
-            <b-col cols="12">
-              <b-form-group
-                  label="Description"
-                  label-for="v-description"
-              >
-                <b-form-textarea
-                    id="v-description"
-                    v-model="post_values.description"
-                    placeholder="Description"
-                />
-              </b-form-group>
-            </b-col>
+            <!-- checkbox -->
+            <!--          <b-col cols="12">-->
+            <!--            <b-form-group>-->
+            <!--              <b-form-checkbox-->
+            <!--                  id="checkbox-3"-->
+            <!--                  name="checkbox-3"-->
+            <!--                  value="Remember_me"-->
+            <!--              >-->
+            <!--                Remember me-->
+            <!--              </b-form-checkbox>-->
+            <!--            </b-form-group>-->
+            <!--          </b-col>-->
 
+            <!-- submit and reset -->
             <b-col cols="12">
               <b-button
                   class="mr-1"
@@ -150,6 +138,18 @@ export default {
       required,
     }
   },
+  created() {
+    var id_val = this.$route.params.resources_id
+    fetch('http://localhost:8081/concern/get-all-info-by-id?id=' + id_val)
+        .then(async response => {
+          const data = await response.json()
+          this.post_values.title = data.data.items[0].concern_id
+        })
+        .catch(error => {
+          this.errorMessage = error
+          console.error('There was an error!', error)
+        })
+  },
   methods: {
     validationForm() {
       this.$refs.simpleRules.validate()
@@ -161,52 +161,14 @@ export default {
     },
     submit() {
 
-      if (!(this.title === 'Edit')) {
-        axios.post('http://localhost:8081/document/save-eresource',
-            this.post_values)
-            .then(response => {
-
-              this.submitFile(response)
-
-            })
-      } else {
-
-        var new_id = this.id
-
-        axios.post('http://localhost:8081/document/update-eresource',
-            this.post_values, { params: { new_id } })
-            .then(response => {
-              window.location.reload()
-            })
-      }
-
-    },
-    getResourceName() {
-      return this.edit_document
-    },
-    getCoverName() {
-      return this.edit_cover
-    },
-    getDocumentName() {
-      return this.edit_document
-    },
-    handleFileUpload(event) {
-      this.model.file = event.target.files[0]
-    },
-    handleFileUploadCoverPhoto(event) {
-      this.model.coverPhoto = event.target.files[0]
-    },
-
-    submitFile(response) {
-
-      var id = response.data.id
+      var id = this.id
 
       let formData = new FormData()
-      formData.append('files', this.model.file)
       formData.append('cover', this.model.coverPhoto)
 
+      var id = this.$route.params.resources_id
       axios.create({
-        baseURL: 'http://localhost:8081/document'
+        baseURL: 'http://localhost:8081/concern'
       })
           .post('/uploadMultipleFiles',
               formData, { params: { id } },
@@ -217,11 +179,21 @@ export default {
               }
           )
           .then(response => {
+
             this.$router.go(-1)
+
           })
           .catch(function () {
             console.log('FAILURE!!')
           })
+
+    },
+    getCoverName() {
+      return this.edit_cover
+    },
+
+    handleFileUploadCoverPhoto(event) {
+      this.model.coverPhoto = event.target.files[0]
     }
   },
 }

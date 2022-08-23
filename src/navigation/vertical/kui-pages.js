@@ -8,17 +8,9 @@ export default [
     icon: 'MailIcon',
   },
   {
-    title: 'Documents',
+    title: 'Library Documents',
     icon: 'FileTextIcon',
-    children: [
-      {
-        title: 'Library Documents',
-        route:  'apps-documents-library_documents',
-      },
-      {
-        title: 'Library Meeting Minutes',
-      },
-    ],
+    route:  'apps-documents-library_documents',
   },
   {
     title: 'Database UI',
