@@ -161,6 +161,8 @@ export default {
     },
     submit() {
 
+      this.flipIn()
+
       var id = this.id
 
       let formData = new FormData()
@@ -190,6 +192,18 @@ export default {
     },
     getCoverName() {
       return this.edit_cover
+    },
+    flipIn() {
+      this.$swal({
+        title: 'Please wait uploading the document',
+        customClass: {
+          confirmButton: 'btn btn-primary',
+        },
+        showClass: {
+          popup: 'animate__animated animate__flipInX',
+        },
+        buttonsStyling: false,
+      })
     },
 
     handleFileUploadCoverPhoto(event) {

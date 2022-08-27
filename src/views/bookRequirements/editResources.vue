@@ -22,7 +22,8 @@
               <b-col cols="12">
                 <b-form-group
                     label="Purchasing Order"
-                    label-for="v-documents">
+                    label-for="v-documents"
+                >
                   <b-form-file
                       @change="handleFileUploadCoverPhoto( $event )"
                       :placeholder="this.getCoverName()"
@@ -36,7 +37,8 @@
               <b-col cols="12">
                 <b-form-group
                     label="Rejected Reason"
-                    label-for="v-description">
+                    label-for="v-description"
+                >
                   <b-form-textarea
                       id="v-description"
                       v-model="post_values.rej_reason"
@@ -139,64 +141,107 @@ export default {
         departmentOptions: ['Nursing', 'BMS', 'Psychology', 'Marketing', 'Acupuncture', 'IT', 'HR', 'Accounting'],
         type: ['Book', 'Journal', 'Magazine', 'PDF', 'Article'],
         resourceOptions: ['Thesis', 'General'],
-        option: [{title: 'Square'}, {title: 'Rectangle'}, {title: 'Rombo'}, {title: 'Romboid'}],
+        option: [{ title: 'Square' }, { title: 'Rectangle' }, { title: 'Rombo' }, { title: 'Romboid' }],
       }
     }
   },
-  setup(){
-    return{
+  setup() {
+    return {
       required,
     }
   },
   created() {
     var id = this.$route.params.id
-    fetch("http://localhost:8081/book/get-by-id?id="+id)
+    fetch('http://localhost:8081/book/get-by-id?id=' + id)
         .then(async response => {
-          const data = await response.json();
-          this.post_values.title = data.data.items[0].title;
-          this.edit_cover = data.data.items[0].document_image;
-          this.totalRows = data.data.total;
+          const data = await response.json()
+          this.post_values.title = data.data.items[0].title
+          this.edit_cover = data.data.items[0].document_image
+          this.totalRows = data.data.total
         })
         .catch(error => {
-          this.errorMessage = error;
-          console.error("There was an error!", error);
+          this.errorMessage = error
+          console.error('There was an error!', error)
         })
   },
   methods: {
     validationForm() {
-      this.$refs.simpleRules.validate().then(success => {
-        if (success) {
-          var id = this.$route.params.id
 
-          var type = '2'
+      if (this.edit_cover !== '') {
 
-          let formData = new FormData();
-          formData.append('files', this.model.coverPhoto);
+        var new_id = this.$route.params.id
+        var type = '2'
+        var resource = this.post_values.rej_reason
+        var user = 3
 
+        axios.post('http://localhost:8081/book/update-eresource',
+            this.post_values,{ params: { new_id,type,resource,user } })
+            .then(response => {
 
-          axios.create({
-            baseURL: 'http://localhost:8081/book'
-          }).post('/uploadMultipleFiles',
-              formData, {params: {id, type}},
-              {
-                headers: {
-                  'Content-Type': 'multipart/form-data'
-                }
+              this.$router.go(-1)
+
+            })
+
+      } else {
+
+        this.flipIn()
+
+        this.$refs.simpleRules.validate()
+            .then(success => {
+              if (success) {
+                var id = this.$route.params.id
+
+                var type = '2'
+
+                let formData = new FormData()
+                formData.append('files', this.model.coverPhoto)
+
+                axios.create({
+                  baseURL: 'http://localhost:8081/book'
+                })
+                    .post('/uploadMultipleFiles',
+                        formData, {
+                          params: {
+                            id,
+                            type
+                          }
+                        },
+                        {
+                          headers: {
+                            'Content-Type': 'multipart/form-data'
+                          }
+                        }
+                    )
+                    .then(response => {
+
+                      this.$router.go(-1)
+
+                    })
+                    .catch(function () {
+                      console.log('FAILURE!!')
+                    })
               }
-          ).then(function () {
-            window.location.reload();
-          })
-              .catch(function () {
-                console.log('FAILURE!!');
-              });
-        }
+            })
+      }
+    },
+    flipIn() {
+      this.$swal({
+        title: 'Please wait uploading the document',
+        customClass: {
+          confirmButton: 'btn btn-primary',
+        },
+        showClass: {
+          popup: 'animate__animated animate__flipInX',
+        },
+        buttonsStyling: false,
       })
     },
+
     getCoverName() {
       return this.edit_cover
     },
     handleFileUploadCoverPhoto(event) {
-      this.model.coverPhoto = event.target.files[0];
+      this.model.coverPhoto = event.target.files[0]
     }
   },
 }
