@@ -373,7 +373,7 @@ export default {
   /* eslint-disable */
   created() {
 
-    fetch("http://localhost:8081/document/get-all-info?page=1&limit=2000&sort=tt")
+    fetch("http://13.232.138.190:8081/document/get-all-info?page=1&limit=2000&sort=tt")
         .then(async response => {
           const data = await response.json();
           this.items = data.data.items;
@@ -405,17 +405,17 @@ export default {
         return 'draft'
     },
     deleteResource(data,updated_user) {
-      axios.delete("http://localhost:8081/document/delete-eresource",
+      axios.delete("http://13.232.138.190:8081/document/delete-eresource",
           { params: { data,updated_user }})
           .then(response => window.location.reload());
     },
     updateEResourceStatus(data, status,updated_user) {
-      axios.put("http://localhost:8081/document/update-eresource-status", null,
+      axios.put("http://13.232.138.190:8081/document/update-eresource-status", null,
           { params: { data, status, updated_user }})
           .then(response => window.location.reload());
     },
     getData() {
-      axios.get("http://localhost:8081/document/get-all-info?page=1&limit=20&sort=tt")
+      axios.get("http://13.232.138.190:8081/document/get-all-info?page=1&limit=20&sort=tt")
           .then(response => {
             const data = response.json();
             this.items = data.data.items;

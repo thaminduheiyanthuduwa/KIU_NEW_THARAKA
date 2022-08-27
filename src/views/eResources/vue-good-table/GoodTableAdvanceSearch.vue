@@ -439,7 +439,7 @@ export default {
   },
   /* eslint-disable */
   created() {
-    fetch("http://localhost:8081/resource/get-all-info?page=1&limit=2000&sort=tt")
+    fetch("http://13.232.138.190:8081/resource/get-all-info?page=1&limit=2000&sort=tt")
         .then(async response => {
           const data = await response.json();
           this.items = data.data.items;
@@ -463,25 +463,19 @@ export default {
       else
         return 'draft'
     },
-    getImage(val) {
 
-      var url = "C:/Users/Thamindu H/Desktop/library/library/uploadedFiles/50_1.jpg"
-      console.log(val)
-      return require('C:/Users/Thamindu H/Desktop/library/library/uploadedFiles/50_1.jpg')
-
-    },
     deleteResource(data,updated_user) {
-      axios.delete("http://localhost:8081/resource/delete-eresource",
+      axios.delete("http://13.232.138.190:8081/resource/delete-eresource",
           { params: { data,updated_user }})
           .then(response => this.$router.go());
     },
     updateEResourceStatus(data, status,updated_user) {
-      axios.put("http://localhost:8081/resource/update-eresource-status", null,
+      axios.put("http://13.232.138.190:8081/resource/update-eresource-status", null,
           { params: { data, status, updated_user }})
           .then(response => this.$router.go());
     },
     getData() {
-      axios.get("http://localhost:8081/resource/get-all-info?page=1&limit=20&sort=tt")
+      axios.get("http://13.232.138.190:8081/resource/get-all-info?page=1&limit=20&sort=tt")
           .then(response => {
             const data = response.json();
             this.items = data.data.items;

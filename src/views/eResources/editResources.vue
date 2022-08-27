@@ -225,7 +225,7 @@ export default {
   },
   created() {
     var id_val = this.$route.params.resources_id
-    fetch("http://localhost:8081/resource/get-by-id?id="+id_val)
+    fetch("http://13.232.138.190:8081/resource/get-by-id?id="+id_val)
         .then(async response => {
           const data = await response.json();
           this.post_values.title = data.data.items[0].title;
@@ -246,7 +246,7 @@ export default {
       this.$refs.simpleRules.validate().then(success => {
         if (success) {
           var new_id = this.$route.params.resources_id
-          axios.post('http://localhost:8081/resource/update-eresource',
+          axios.post('http://13.232.138.190:8081/resource/update-eresource',
               this.post_values,{ params: { new_id } })
               .then(response => {
 

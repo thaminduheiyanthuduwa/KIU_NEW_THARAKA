@@ -52,11 +52,11 @@ export default {
 
     // Navbar Components
     BNavbarNav,
-    Bookmarks,
-    Locale,
+    // Bookmarks,
+    // Locale,
     SearchBar,
     DarkToggler,
-    CartDropdown,
+    // CartDropdown,
     NotificationDropdown,
     UserDropdown,
   },

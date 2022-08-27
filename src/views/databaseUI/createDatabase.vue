@@ -181,7 +181,7 @@ export default {
     },
     submit() {
 
-      axios.post('http://localhost:8081/database/save-eresource',
+      axios.post('http://13.232.138.190:8081/database/save-eresource',
           this.post_values)
           .then(response => {
 
@@ -209,7 +209,7 @@ export default {
       formData.append('cover', this.model.coverPhoto)
 
       axios.create({
-        baseURL: 'http://localhost:8081/database'
+        baseURL: 'http://13.232.138.190:8081/database'
       })
           .post('/uploadMultipleFiles',
               formData, { params: { id } },

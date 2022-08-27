@@ -51,7 +51,7 @@ export default {
 
     // Navbar Components
     BNavbarNav,
-    Bookmarks,
+    // Bookmarks,
     Locale,
     DarkToggler,
     SearchBar,

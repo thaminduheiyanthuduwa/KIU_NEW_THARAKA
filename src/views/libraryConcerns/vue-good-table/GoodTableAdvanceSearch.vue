@@ -462,7 +462,7 @@ export default {
   },
   /* eslint-disable */
   created() {
-    fetch("http://localhost:8081/concern/get-all-info?page=1&limit=2000&sort=tt")
+    fetch("http://13.232.138.190:8081/concern/get-all-info?page=1&limit=2000&sort=tt")
         .then(async response => {
           const data = await response.json();
           this.items = data.data.items;
@@ -501,19 +501,19 @@ export default {
       return 'outline-success'
     },
     updateEResourceStatus(data, status, updated_user) {
-      axios.put("http://localhost:8081/concern/update-status", null,
+      axios.put("http://13.232.138.190:8081/concern/update-status", null,
           {params: {data, status, updated_user}})
           .then(response => window.location.reload());
     },
     getData() {
-      axios.get("http://localhost:8081/database/get-all-info?page=1&limit=20&sort=tt")
+      axios.get("http://13.232.138.190:8081/database/get-all-info?page=1&limit=20&sort=tt")
           .then(response => {
             const data = response.json();
             this.items = data.data.items;
           });
     },
     getFile(data) {
-      axios.get("http://localhost:8081/concern/downloadFile",
+      axios.get("http://13.232.138.190:8081/concern/downloadFile",
           {params: {data}}),
           {responseType: 'blob'}
               .then(response => {

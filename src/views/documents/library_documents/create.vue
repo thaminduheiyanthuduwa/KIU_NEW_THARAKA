@@ -162,7 +162,7 @@ export default {
     submit() {
 
       if (!(this.title === 'Edit')) {
-        axios.post('http://localhost:8081/document/save-eresource',
+        axios.post('http://13.232.138.190:8081/document/save-eresource',
             this.post_values)
             .then(response => {
 
@@ -173,7 +173,7 @@ export default {
 
         var new_id = this.id
 
-        axios.post('http://localhost:8081/document/update-eresource',
+        axios.post('http://13.232.138.190:8081/document/update-eresource',
             this.post_values, { params: { new_id } })
             .then(response => {
               window.location.reload()
@@ -206,7 +206,7 @@ export default {
       formData.append('cover', this.model.coverPhoto)
 
       axios.create({
-        baseURL: 'http://localhost:8081/document'
+        baseURL: 'http://13.232.138.190:8081/document'
       })
           .post('/uploadMultipleFiles',
               formData, { params: { id } },

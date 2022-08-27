@@ -1,33 +1,33 @@
 <template>
   <b-navbar-nav class="nav">
-    <b-nav-item
-      v-for="(bookmark, index) in bookmarks"
-      :id="`bookmark-${index}`"
-      :key="index"
-      :to="bookmark.route"
-    >
-      <feather-icon
-        :icon="bookmark.icon"
-        size="21"
-      />
-      <b-tooltip
-        triggers="hover"
-        :target="`bookmark-${index}`"
-        :title="bookmark.title"
-        :delay="{ show: 1000, hide: 50 }"
-      />
-    </b-nav-item>
+<!--    <b-nav-item-->
+<!--      v-for="(bookmark, index) in bookmarks"-->
+<!--      :id="`bookmark-${index}`"-->
+<!--      :key="index"-->
+<!--      :to="bookmark.route"-->
+<!--    >-->
+<!--      <feather-icon-->
+<!--        :icon="bookmark.icon"-->
+<!--        size="21"-->
+<!--      />-->
+<!--      <b-tooltip-->
+<!--        triggers="hover"-->
+<!--        :target="`bookmark-${index}`"-->
+<!--        :title="bookmark.title"-->
+<!--        :delay="{ show: 1000, hide: 50 }"-->
+<!--      />-->
+<!--    </b-nav-item>-->
     <b-nav-item-dropdown
       link-classes="bookmark-star"
       lazy
       @hidden="resetsearchQuery"
     >
-      <feather-icon
-        slot="button-content"
-        icon="StarIcon"
-        size="21"
-        class="text-warning"
-      />
+<!--      <feather-icon-->
+<!--        slot="button-content"-->
+<!--        icon="StarIcon"-->
+<!--        size="21"-->
+<!--        class="text-warning"-->
+<!--      />-->
 
       <!-- Dropdown Content -->
       <li style="min-width:300px">

@@ -140,7 +140,7 @@ export default {
   },
   created() {
     var id_val = this.$route.params.resources_id
-    fetch('http://localhost:8081/concern/get-all-info-by-id?id=' + id_val)
+    fetch('http://13.232.138.190:8081/concern/get-all-info-by-id?id=' + id_val)
         .then(async response => {
           const data = await response.json()
           this.post_values.title = data.data.items[0].concern_id
@@ -168,7 +168,7 @@ export default {
 
       var id = this.$route.params.resources_id
       axios.create({
-        baseURL: 'http://localhost:8081/concern'
+        baseURL: 'http://13.232.138.190:8081/concern'
       })
           .post('/uploadMultipleFiles',
               formData, { params: { id } },
