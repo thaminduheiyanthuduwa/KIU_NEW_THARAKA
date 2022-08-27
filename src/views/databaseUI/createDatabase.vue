@@ -179,7 +179,20 @@ export default {
             }
           })
     },
+    flipIn() {
+      this.$swal({
+        title: 'Please wait uploading the document',
+        customClass: {
+          confirmButton: 'btn btn-primary',
+        },
+        showClass: {
+          popup: 'animate__animated animate__flipInX',
+        },
+        buttonsStyling: false,
+      })
+    },
     submit() {
+      this.flipIn()
 
       axios.post('http://13.232.138.190:8081/database/save-eresource',
           this.post_values)

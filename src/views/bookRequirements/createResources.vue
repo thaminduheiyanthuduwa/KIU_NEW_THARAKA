@@ -17,39 +17,35 @@
                 />
               </b-form-group>
             </b-col>
-
             <b-col cols="12">
               <b-form-group
-                  label="Documents"
-                  label-for="v-documents"
+                  label="Department"
+                  label-for="v-department"
               >
+                <v-select
+                    v-model="post_values.department"
+                    :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
+                    :options="model.departmentOptions"
+                    placeholder="Please select"
+                />
+              </b-form-group>
+            </b-col>
+            <b-col cols="12">
+              <b-form-group
+                  label="Book Document"
+                  label-for="v-documents">
                 <b-form-file
 
                     @change="handleFileUpload( $event )"
-                    :placeholder="this.getDocumentName()"
+                    :placeholder="this.getResourceName()"
                     drop-placeholder="Drop file here..."
                 />
               </b-form-group>
             </b-col>
-
-            <b-col cols="12">
-              <b-form-group
-                  label="Cover Photo"
-                  label-for="v-documents"
-              >
-                <b-form-file
-                    @change="handleFileUploadCoverPhoto( $event )"
-                    :placeholder="this.getCoverName()"
-                    drop-placeholder="Drop file here..."
-                />
-              </b-form-group>
-            </b-col>
-
             <b-col cols="12">
               <b-form-group
                   label="Description"
-                  label-for="v-description"
-              >
+                  label-for="v-description">
                 <b-form-textarea
                     id="v-description"
                     v-model="post_values.description"
@@ -57,7 +53,6 @@
                 />
               </b-form-group>
             </b-col>
-
             <b-col cols="12">
               <b-button
                   class="mr-1"
@@ -104,6 +99,7 @@ import {
   BListGroupItem,
 } from 'bootstrap-vue'
 import axios from 'axios'
+import router from '@/router'
 /* eslint-disable */
 export default {
   name: 'createResources',
@@ -133,15 +129,23 @@ export default {
         cover_name: ''
       },
       post_values: {
+        author: '',
+        department: '',
         title: '',
-        url: '',
-        description: ''
+        resource: '',
+        type: '',
+        description: '',
+        rej_reason: ''
       },
       model: {
         file: '',
         coverPhoto: '',
         resource: '',
-        department: ''
+        department: '',
+        departmentOptions: ['Nursing', 'BMS', 'Psychology', 'Marketing', 'Acupuncture', 'IT', 'HR', 'Accounting'],
+        type: ['Book', 'Journal', 'Magazine', 'PDF', 'Article'],
+        resourceOptions: ['Thesis', 'General'],
+        option: [{title: 'Square'}, {title: 'Rectangle'}, {title: 'Rombo'}, {title: 'Romboid'}],
       }
     }
   },
@@ -155,6 +159,7 @@ export default {
       this.$refs.simpleRules.validate()
           .then(success => {
             if (success) {
+
               this.submit()
             }
           })
@@ -164,22 +169,22 @@ export default {
       this.flipIn()
 
       if (!(this.title === 'Edit')) {
-        axios.post('http://13.232.138.190:8081/document/save-eresource',
+        axios.post("http://localhost:8081/book/save-eresource",
             this.post_values)
             .then(response => {
 
-              this.submitFile(response)
+              this.submitFile(response, '1')
 
-            })
+            });
       } else {
 
         var new_id = this.id
 
-        axios.post('http://13.232.138.190:8081/document/update-eresource',
-            this.post_values, { params: { new_id } })
+        axios.post("http://localhost:8081/book/update-eresource",
+            this.post_values, {params: {new_id}})
             .then(response => {
-              window.location.reload()
-            })
+              this.$router.go(-1)
+            });
       }
 
     },
@@ -189,15 +194,13 @@ export default {
     getCoverName() {
       return this.edit_cover
     },
-    getDocumentName() {
-      return this.edit_document
-    },
     handleFileUpload(event) {
-      this.model.file = event.target.files[0]
+      this.model.file = event.target.files[0];
     },
     handleFileUploadCoverPhoto(event) {
-      this.model.coverPhoto = event.target.files[0]
+      this.model.coverPhoto = event.target.files[0];
     },
+
     flipIn() {
       this.$swal({
         title: 'Please wait uploading the document',
@@ -210,31 +213,57 @@ export default {
         buttonsStyling: false,
       })
     },
-    submitFile(response) {
+
+    submitFile(response, type) {
 
       var id = response.data.id
 
-      let formData = new FormData()
-      formData.append('files', this.model.file)
-      formData.append('cover', this.model.coverPhoto)
+      let formData = new FormData();
+      formData.append('files', this.model.file);
+
 
       axios.create({
-        baseURL: 'http://13.232.138.190:8081/document'
+        baseURL: 'http://localhost:8081/book'
+      }).post('/uploadMultipleFiles',
+          formData, {params: {id, type}},
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+      ).then(function () {
+        window.location.reload();
       })
-          .post('/uploadMultipleFiles',
-              formData, { params: { id } },
-              {
-                headers: {
-                  'Content-Type': 'multipart/form-data'
-                }
-              }
-          )
-          .then(response => {
-            this.$router.go(-1)
-          })
           .catch(function () {
-            console.log('FAILURE!!')
-          })
+            console.log('FAILURE!!');
+          });
+    },
+    submitCoverFile(response) {
+
+      this.flipIn()
+
+      var id = this.id
+      var type = '2'
+
+      let formData = new FormData();
+      formData.append('files', this.model.coverPhoto);
+
+
+      axios.create({
+        baseURL: 'http://localhost:8081/book'
+      }).post('/uploadMultipleFiles',
+          formData, {params: {id, type}},
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+      ).then(function () {
+        window.location.reload();
+      })
+          .catch(function () {
+            console.log('FAILURE!!');
+          });
     }
   },
 }
