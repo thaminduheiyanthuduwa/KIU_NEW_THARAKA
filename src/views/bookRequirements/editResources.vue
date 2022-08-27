@@ -152,7 +152,7 @@ export default {
   },
   created() {
     var id = this.$route.params.id
-    fetch('http://localhost:8081/book/get-by-id?id=' + id)
+    fetch("http://13.232.138.190:8081/book/get-by-id?id="+id)
         .then(async response => {
           const data = await response.json()
           this.post_values.title = data.data.items[0].title
@@ -174,7 +174,7 @@ export default {
         var resource = this.post_values.rej_reason
         var user = 3
 
-        axios.post('http://localhost:8081/book/update-eresource',
+        axios.post('http://13.232.138.190:8081/book/update-eresource',
             this.post_values,{ params: { new_id,type,resource,user } })
             .then(response => {
 
@@ -197,7 +197,7 @@ export default {
                 formData.append('files', this.model.coverPhoto)
 
                 axios.create({
-                  baseURL: 'http://localhost:8081/book'
+                  baseURL: 'http://13.232.138.190:8081/book'
                 })
                     .post('/uploadMultipleFiles',
                         formData, {

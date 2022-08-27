@@ -419,7 +419,6 @@ export default {
     return{
     }
   },
-
   /* eslint-disable */
   computed: {
     direction() {

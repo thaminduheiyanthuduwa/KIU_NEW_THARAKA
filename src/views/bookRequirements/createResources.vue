@@ -169,7 +169,7 @@ export default {
       this.flipIn()
 
       if (!(this.title === 'Edit')) {
-        axios.post("http://localhost:8081/book/save-eresource",
+        axios.post("http://13.232.138.190:8081/book/save-eresource",
             this.post_values)
             .then(response => {
 
@@ -180,7 +180,7 @@ export default {
 
         var new_id = this.id
 
-        axios.post("http://localhost:8081/book/update-eresource",
+        axios.post("http://13.232.138.190:8081/book/update-eresource",
             this.post_values, {params: {new_id}})
             .then(response => {
               this.$router.go(-1)
@@ -223,7 +223,7 @@ export default {
 
 
       axios.create({
-        baseURL: 'http://localhost:8081/book'
+        baseURL: 'http://13.232.138.190:8081/book'
       }).post('/uploadMultipleFiles',
           formData, {params: {id, type}},
           {
@@ -252,7 +252,7 @@ export default {
 
 
       axios.create({
-        baseURL: 'http://localhost:8081/book'
+        baseURL: 'http://13.232.138.190:8081/book'
       }).post('/uploadMultipleFiles',
           formData, {params: {id, type}},
           {
