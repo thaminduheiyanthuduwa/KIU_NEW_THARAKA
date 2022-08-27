@@ -231,8 +231,10 @@ export default {
               'Content-Type': 'multipart/form-data'
             }
           }
-      ).then(function () {
-        window.location.reload();
+      ).then(response => {
+
+        this.$router.go(-1)
+
       })
           .catch(function () {
             console.log('FAILURE!!');
@@ -258,8 +260,10 @@ export default {
               'Content-Type': 'multipart/form-data'
             }
           }
-      ).then(function () {
-        window.location.reload();
+      ).then(response => {
+
+        this.$router.go(-1)
+
       })
           .catch(function () {
             console.log('FAILURE!!');
