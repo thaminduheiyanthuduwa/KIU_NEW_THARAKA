@@ -258,7 +258,16 @@
         <template #cell(avatar)="data">
           <b-avatar :src="data.value"/>
         </template>
-
+        <template #cell(is_active)="data">
+          <b-badge :variant="is_active[1][data.value]">
+            {{ is_active[0][data.value] }}
+          </b-badge>
+        </template>
+        <template #cell(is_public)="data">
+          <b-badge :variant="is_public[1][data.value]">
+            {{ is_public[0][data.value] }}
+          </b-badge>
+        </template>
         <template #cell(status)="data">
           <b-badge :variant="status[1][data.value]">
             {{ status[0][data.value] }}
@@ -416,8 +425,16 @@ export default {
 
         },
         'date',
-        'is_active',
-        'is_public'],
+        {
+          key: 'is_active',
+          label: 'is_active'
+
+        },
+        {
+          key: 'is_public',
+          label: 'is_public'
+
+        }],
       /* eslint-disable global-require */
       items: [],
       /* eslint-disable global-require */
@@ -435,6 +452,24 @@ export default {
           4: 'light-warning',
           5: 'light-info',
         }],
+      is_active: [{
+        0: 'Inactive',
+        1: 'Active',
+      },
+        {
+          1: 'light-success',
+          0: 'light-danger',
+
+        }],
+      is_public: [{
+        0: 'private',
+        1: 'public',
+      },
+        {
+          1: 'light-success',
+          0: 'light-danger',
+
+        }]
     }
   },
   setup(){

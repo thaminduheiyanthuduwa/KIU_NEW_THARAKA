@@ -161,6 +161,8 @@ export default {
     },
     submit() {
 
+      this.flipIn()
+
       if (!(this.title === 'Edit')) {
         axios.post('http://localhost:8081/document/save-eresource',
             this.post_values)
@@ -196,7 +198,18 @@ export default {
     handleFileUploadCoverPhoto(event) {
       this.model.coverPhoto = event.target.files[0]
     },
-
+    flipIn() {
+      this.$swal({
+        title: 'Please wait uploading the document',
+        customClass: {
+          confirmButton: 'btn btn-primary',
+        },
+        showClass: {
+          popup: 'animate__animated animate__flipInX',
+        },
+        buttonsStyling: false,
+      })
+    },
     submitFile(response) {
 
       var id = response.data.id

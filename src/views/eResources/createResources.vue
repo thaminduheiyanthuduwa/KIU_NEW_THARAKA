@@ -264,6 +264,8 @@ export default {
     },
     submit() {
 
+      this.flipIn()
+
       axios.post('http://localhost:8081/resource/save-eresource',
           this.post_values)
           .then(response => {
@@ -279,7 +281,6 @@ export default {
     handleFileUploadCoverPhoto(event) {
       this.model.coverPhoto = event.target.files[0]
     },
-
     submitFile(response) {
 
       var id = response.data.id
@@ -305,7 +306,19 @@ export default {
           .catch(function () {
             console.log('FAILURE!!')
           })
-    }
+    },
+    flipIn() {
+      this.$swal({
+        title: 'Please wait uploading the document',
+        customClass: {
+          confirmButton: 'btn btn-primary',
+        },
+        showClass: {
+          popup: 'animate__animated animate__flipInX',
+        },
+        buttonsStyling: false,
+      })
+    },
   },
 }
 

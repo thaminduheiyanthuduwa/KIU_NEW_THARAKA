@@ -10,62 +10,42 @@
                   label="Title"
                   label-for="v-title"
               >
-                <validation-provider
-                    #default="{ errors }"
-                    name="Title"
-                    rules="required"
-                >
-                  <b-form-input
-                      id="v-title"
-                      v-model="post_values.title"
-                      placeholder="Title"
-                  />
-                  <small class="text-danger">{{ errors[0] }}</small>
-                </validation-provider>
+                <b-form-input
+                    id="v-title"
+                    v-model="post_values.title"
+                    placeholder="Title"
+                />
               </b-form-group>
             </b-col>
-
-            <!-- Department -->
             <b-col cols="12">
               <b-form-group
-                  label="URL"
-                  label-for="v-url"
+                  label="Department"
+                  label-for="v-department"
               >
-                <validation-provider
-                    #default="{ errors }"
-                    name="URL"
-                    rules="required"
-                >
-                  <b-form-input
-                      id="v-url"
-                      v-model="post_values.url"
-                      placeholder="URL"
-                  />
-                  <small class="text-danger">{{ errors[0] }}</small>
-                </validation-provider>
+                <v-select
+                    v-model="post_values.department"
+                    :dir="$store.state.appConfig.isRTL ? 'rtl' : 'ltr'"
+                    :options="model.departmentOptions"
+                    placeholder="Please select"
+                />
               </b-form-group>
             </b-col>
-
             <b-col cols="12">
               <b-form-group
-                  label="Cover Photo"
-                  label-for="v-documents"
-              >
-
+                  label="Book Document"
+                  label-for="v-documents">
                 <b-form-file
-                    @change="handleFileUploadCoverPhoto( $event )"
+
+                    @change="handleFileUpload( $event )"
+                    :placeholder="this.getResourceName()"
                     drop-placeholder="Drop file here..."
                 />
-
-
               </b-form-group>
             </b-col>
-
             <b-col cols="12">
               <b-form-group
                   label="Description"
-                  label-for="v-description"
-              >
+                  label-for="v-description">
                 <b-form-textarea
                     id="v-description"
                     v-model="post_values.description"
@@ -73,8 +53,6 @@
                 />
               </b-form-group>
             </b-col>
-
-            <!-- submit and reset -->
             <b-col cols="12">
               <b-button
                   class="mr-1"
@@ -145,22 +123,29 @@ export default {
   /* eslint-disable */
   data() {
     return {
-      file: '',
       id_back: '',
       doc: {
         resource_name: '',
         cover_name: ''
       },
       post_values: {
+        author: '',
+        department: '',
         title: '',
-        url: '',
-        description: ''
+        resource: '',
+        type: '',
+        description: '',
+        rej_reason: ''
       },
       model: {
         file: '',
         coverPhoto: '',
         resource: '',
-        department: ''
+        department: '',
+        departmentOptions: ['Nursing', 'BMS', 'Psychology', 'Marketing', 'Acupuncture', 'IT', 'HR', 'Accounting'],
+        type: ['Book', 'Journal', 'Magazine', 'PDF', 'Article'],
+        resourceOptions: ['Thesis', 'General'],
+        option: [{title: 'Square'}, {title: 'Rectangle'}, {title: 'Rombo'}, {title: 'Romboid'}],
       }
     }
   },
@@ -179,6 +164,43 @@ export default {
             }
           })
     },
+    submit() {
+
+      this.flipIn()
+
+      if (!(this.title === 'Edit')) {
+        axios.post("http://localhost:8081/book/save-eresource",
+            this.post_values)
+            .then(response => {
+
+              this.submitFile(response, '1')
+
+            });
+      } else {
+
+        var new_id = this.id
+
+        axios.post("http://localhost:8081/book/update-eresource",
+            this.post_values, {params: {new_id}})
+            .then(response => {
+              this.$router.go(-1)
+            });
+      }
+
+    },
+    getResourceName() {
+      return this.edit_document
+    },
+    getCoverName() {
+      return this.edit_cover
+    },
+    handleFileUpload(event) {
+      this.model.file = event.target.files[0];
+    },
+    handleFileUploadCoverPhoto(event) {
+      this.model.coverPhoto = event.target.files[0];
+    },
+
     flipIn() {
       this.$swal({
         title: 'Please wait uploading the document',
@@ -191,53 +213,57 @@ export default {
         buttonsStyling: false,
       })
     },
-    submit() {
-      this.flipIn()
 
-      axios.post('http://localhost:8081/database/save-eresource',
-          this.post_values)
-          .then(response => {
-
-            this.submitFile(response)
-
-          })
-
-    },
-    getResourceName() {
-      return this.edit_document
-    },
-    getCoverName() {
-      return this.edit_cover
-    },
-
-    handleFileUploadCoverPhoto(event) {
-      this.model.coverPhoto = event.target.files[0]
-    },
-
-    submitFile(response) {
+    submitFile(response, type) {
 
       var id = response.data.id
 
-      let formData = new FormData()
-      formData.append('cover', this.model.coverPhoto)
+      let formData = new FormData();
+      formData.append('files', this.model.file);
+
 
       axios.create({
-        baseURL: 'http://localhost:8081/database'
+        baseURL: 'http://localhost:8081/book'
+      }).post('/uploadMultipleFiles',
+          formData, {params: {id, type}},
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+      ).then(function () {
+        window.location.reload();
       })
-          .post('/uploadMultipleFiles',
-              formData, { params: { id } },
-              {
-                headers: {
-                  'Content-Type': 'multipart/form-data'
-                }
-              }
-          )
-          .then(response => {
-            this.$router.go(-1)
-          })
           .catch(function () {
-            console.log('FAILURE!!')
-          })
+            console.log('FAILURE!!');
+          });
+    },
+    submitCoverFile(response) {
+
+      this.flipIn()
+
+      var id = this.id
+      var type = '2'
+
+      let formData = new FormData();
+      formData.append('files', this.model.coverPhoto);
+
+
+      axios.create({
+        baseURL: 'http://localhost:8081/book'
+      }).post('/uploadMultipleFiles',
+          formData, {params: {id, type}},
+          {
+            headers: {
+              'Content-Type': 'multipart/form-data'
+            }
+          }
+      ).then(function () {
+        window.location.reload();
+      })
+          .catch(function () {
+            console.log('FAILURE!!');
+          });
     }
   },
 }

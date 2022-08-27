@@ -5,7 +5,7 @@
     <b-button
         style="margin-bottom: 10px"
         variant="primary"
-        @click="() => $router.push(`/apps/databaseUI/creatDatabaseUI`)"
+        @click="() => $router.push(`/apps/bookRequirements/creat_book_requirements`)"
     >
       Add
     </b-button>
@@ -43,7 +43,17 @@
           </b-form-group>
         </b-col>
 
-
+        <b-col md="4">
+          <b-form-group>
+            <label>Status:</label>
+            <b-form-input
+                class="d-inline-block"
+                placeholder="Search"
+                type="text"
+                @input="advanceSearch"
+            />
+          </b-form-group>
+        </b-col>
       </b-row>
     </div>
 
@@ -77,25 +87,13 @@
         <!-- full detail on click -->
         <template #row-details="row">
           <b-card>
-            <b-row class="mb-2">
-              <b-col>
-                <div class="bg-light-primary rounded-top text-center">
-                  <b-img
-                      :src="require('@/assets/images/illustration/email.svg')"
-                      alt="Meeting Pic"
-                      height="170"
-                  />
-                </div>
-              </b-col>
-            </b-row>
-
 
             <b-row class="mb-2">
               <b-col
                   class="mb-1"
                   md="4"
               >
-                <strong>Published Date : </strong>{{ row.item.display_time }}
+                <strong>Published Date : </strong>{{ row.item.added_date }}
               </b-col>
               <b-col
                   class="mb-1"
@@ -107,7 +105,19 @@
                   class="mb-1"
                   md="4"
               >
-                <strong>URL : </strong>{{ row.item.url }}
+                <strong>Finalized Document : </strong>{{ row.item.document_image }}
+              </b-col>
+              <b-col
+                  class="mb-1"
+                  md="4"
+              >
+                <strong>Department : </strong>{{ row.item.department }}
+              </b-col>
+              <b-col
+                  class="mb-1"
+                  md="4"
+              >
+                <strong>Rejected Reason : </strong>{{ items[row.index].reason_if_rejected }}
               </b-col>
               <b-col
                   class="mb-1"
@@ -119,15 +129,8 @@
                   class="mb-1"
                   md="4"
               >
-                <strong>Description : </strong>{{ items[row.index].description }}
+                <strong>Resource Title : </strong>{{ row.item.resource_title }}
               </b-col>
-
-              <!--              <b-col-->
-              <!--                  class="mb-1"-->
-              <!--                  md="4"-->
-              <!--              >-->
-              <!--                <strong>Age : </strong>{{ row.item.age }}-->
-              <!--              </b-col>-->
             </b-row>
             <div class="demo-inline-spacing">
               <b-button
@@ -141,7 +144,7 @@
                   size="sm"
                   style="margin-left: 10px"
                   variant="outline-primary"
-                  @click="() => $router.push(`/apps/databaseUI/editDatabaseUI/${items[row.index].id}`)"
+                  @click="() => $router.push(`/apps/bookRequirements/edit_book_requirements/${items[row.index].id}`)"
               >
                 edit
               </b-button>
@@ -157,10 +160,30 @@
                   size="sm"
                   style="margin-left: 10px"
                   variant="outline-success"
-                  @click="updateEResourceStatus(row.item.id,getStatus(row.item.status),5)"
+                  @click="updateEResourceStatus(row.item.id,getStatus(row.item.status),5, getStatus(row.item.status))"
               >
                 {{ getStatus(row.item.status) }}
               </b-button>
+              <div v-if="row.item.head_approval == 0 && row.item.document_image != '' && row.item.status != 'draft'">
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-success"
+                    @click="updateEResourceStatus(row.item.id,'Approve',5, 2)"
+                >
+                  Approve
+                </b-button>
+              </div>
+              <div v-if="row.item.final_approval == 0 && row.item.head_approval == 1">
+                <b-button
+                    size="sm"
+                    style="margin-left: 10px"
+                    variant="outline-success"
+                    @click="updateEResourceStatus(row.item.id,'Approve',5, 4)"
+                >
+                  Final Approval
+                </b-button>
+              </div>
             </div>
           </b-card>
         </template>
@@ -172,6 +195,17 @@
         <template #cell(status)="data">
           <b-badge :variant="status[1][data.value]">
             {{ status[0][data.value] }}
+          </b-badge>
+        </template>
+        <template #cell(head_approval)="data">
+          <b-badge :variant="head_approval[1][data.value]">
+            {{ head_approval[0][data.value] }}
+          </b-badge>
+        </template>
+
+        <template #cell(final_approval)="data">
+          <b-badge :variant="final_approval[1][data.value]">
+            {{ final_approval[0][data.value] }}
           </b-badge>
         </template>
       </b-table>
@@ -293,8 +327,17 @@ export default {
       pageLength: 5,
       pageOptions: [3, 5, 10],
       perPage: 5,
-      totalRows: 1,
+      totalRows: 10,
       currentPage: 1,
+      edit_id: '',
+      edit_title: '',
+      edit_department: '',
+      edit_resource: '',
+      edit_author: '',
+      edit_document: '',
+      edit_cover: '',
+      edit_description: '',
+      edit_type: '',
       sortBy: '',
       sortDesc: false,
       sortDirection: 'asc',
@@ -313,19 +356,37 @@ export default {
       fields: [
         'show_details',
         'id',
-        'display_time',
         'title',
-        'url',
-        'cover_photo',
+        'added_date',
         {
           key: 'status',
           label: 'Status'
 
+        },
+        {
+          key: 'status',
+          label: 'Statuss'
+
+        },
+        'department',
+        'resource_title',
+        {
+          key: 'document_image',
+          label: 'Finalized Document'
+
+        },
+        {
+          key: 'head_approval',
+          label: 'head_approval'
+
+        },
+        {
+          key: 'final_approval',
+          label: 'final_approval'
+
         }],
       /* eslint-disable global-require */
-      items: [
-
-      ],
+      items: [],
       /* eslint-disable global-require */
       status: [{
         published: 'Published',
@@ -341,12 +402,41 @@ export default {
           4: 'light-warning',
           5: 'light-info',
         }],
+      head_approval: [{
+        0: 'Not Approved',
+        1: 'Approved',
+        2: 'Professional',
+        draft: 'Draft',
+        4: 'Resigned',
+        5: 'Applied',
+      },
+        {
+          1: 'light-primary',
+          2: 'light-success',
+          0: 'light-danger',
+          4: 'light-warning',
+          5: 'light-info',
+        }],
+      final_approval: [{
+        0: 'Not Approved',
+        1: 'Approved',
+        2: 'Professional',
+        draft: 'Draft',
+        4: 'Resigned',
+        5: 'Applied',
+      },
+        {
+          1: 'light-primary',
+          2: 'light-success',
+          0: 'light-danger',
+          4: 'light-warning',
+          5: 'light-info',
+        }]
     }
   },
-  setup(){
+  setup() {
     // const router = useRouter();
-    return{
-    }
+    return {}
   },
 
   /* eslint-disable */
@@ -368,47 +458,66 @@ export default {
   },
   /* eslint-disable */
   created() {
-    fetch("http://localhost:8081/database/get-all-info?page=1&limit=2000&sort=tt")
+
+    fetch('http://localhost:8081/book/get-all-info?page=1&limit=2000&sort=tt')
         .then(async response => {
-          const data = await response.json();
-          this.items = data.data.items;
-          this.totalRows = data.data.total;
+          const data = await response.json()
+          this.items = data.data.items
+          this.totalRows = data.data.total
         })
         .catch(error => {
-          this.errorMessage = error;
-          console.error("There was an error!", error);
+          this.errorMessage = error
+          console.error('There was an error!', error)
         })
+
   },
   methods: {
     advanceSearch(val) {
       this.filter = val
     },
-    onRowClick(params) {
-      console.log(params)
-    },
     getStatus(val) {
-      if (val == 'draft')
+      if (val == 'draft') {
         return 'published'
-      else
+      } else {
         return 'draft'
+      }
     },
-
-    deleteResource(data,updated_user) {
-      axios.delete("http://localhost:8081/database/delete-eresource",
-          { params: { data,updated_user }})
-          .then(response => window.location.reload());
+    getHeadStatus(val) {
+      if (val == '0') {
+        return 'approved'
+      }
     },
-    updateEResourceStatus(data, status,updated_user) {
-      axios.put("http://localhost:8081/database/update-eresource-status", null,
-          { params: { data, status, updated_user }})
-          .then(response => window.location.reload());
+    deleteResource(data, updated_user) {
+      axios.delete('http://localhost:8081/book/delete-eresource',
+          {
+            params: {
+              data,
+              updated_user
+            }
+          })
+          .then(response => window.location.reload())
+    },
+    updateEResourceStatus(data, status, updated_user, type) {
+      axios.put('http://localhost:8081/book/update-eresource-status', null,
+          {
+            params: {
+              data,
+              status,
+              updated_user,
+              type
+            }
+          })
+          .then(response => window.location.reload())
     },
     getData() {
-      axios.get("http://localhost:8081/database/get-all-info?page=1&limit=20&sort=tt")
+      axios.get('http://localhost:8081/book/get-all-info?page=1&limit=20&sort=tt')
           .then(response => {
-            const data = response.json();
-            this.items = data.data.items;
-          });
+            const data = response.json()
+            this.items = data.data.items
+          })
+    },
+    onRowClick(params) {
+      console.log(params)
     }
   },
 }
